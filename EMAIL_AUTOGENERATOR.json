@@ -1,0 +1,202 @@
+{
+  "name": "EMAIL AUTOGENERATOR",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2dee8fd1-f4f9-4527-8391-2dd4386b6ebf",
+      "name": "When chat message received",
+      "webhookId": "56106863-864f-4c2c-bc42-8e0eaa80dc04"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are Sam's personal assistant. You ronly job is to send his emails in a friendly and professional manner on his behalf. You  only have access to Sam's conatcts and can send emails. \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        220,
+        0
+      ],
+      "id": "56c36ec6-c659-4c05-94de-0c51df356909",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        100,
+        200
+      ],
+      "id": "e0f9a83c-9f42-41a4-ab90-6d07e28c3a46",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "MNcKznVrW1K5o0nI",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        200
+      ],
+      "id": "1d0dd8f9-1c53-4c90-b4d0-5970d0d4e76b",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use google sheets to get Sam's contacts. ",
+        "documentId": {
+          "__rl": true,
+          "value": "1FRR0wcqedqaCXLxl_vVJJJP7EJHFn-uagMy7GB1r0H4",
+          "mode": "list",
+          "cachedResultName": "Untitled spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FRR0wcqedqaCXLxl_vVJJJP7EJHFn-uagMy7GB1r0H4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FRR0wcqedqaCXLxl_vVJJJP7EJHFn-uagMy7GB1r0H4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        340,
+        200
+      ],
+      "id": "35a9155a-fa9e-4227-8e02-9de638ff26c3",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GlFumaBr90ezwaSo",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use the gamil tool to send emails in a friendly and professional tone. ",
+        "sendTo": "={{ $fromai(\"recepient_email_address\") }}",
+        "subject": "={{ $fromai(\"remail_subject\") }}",
+        "emailType": "text",
+        "message": "={{ $fromai(\"email_message\") }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        200
+      ],
+      "id": "0e8e612a-f845-4e04-891a-18928cabd5d9",
+      "name": "Gmail",
+      "webhookId": "2d35acd1-cc98-42e2-ba21-9bf52d84b285",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "LmoSt7QIfzki1JeQ",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1aa50c93-cd4a-4ac5-b7e7-65609b060741",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "073e1f64adfaa5e14807f3c911ef84714b7d802560a35f6a3e287f9e2edc630d"
+  },
+  "id": "0vXevGC6HNQ5P58o",
+  "tags": []
+}
